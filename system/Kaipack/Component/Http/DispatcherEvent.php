@@ -11,12 +11,12 @@ class DispatcherEvent extends Event
 	/**
 	 * events
 	 */
-	const EVENT_DISPATCH_ERROR	= 'dispatcher.event.dispatcher-error';
-	const EVENT_RESPONSE		= 'dispatcher.event.response';
-	const EVENT_DISPATCH		= 'dispatcher.event.dispatch';
-	const EVENT_REQUEST			= 'dispatcher.event.request';
-	const EVENT_RENDER			= 'dispatcher.event.render';
-	const EVENT_ROUTE			= 'dispatcher.event.route';
+	const EVENT_DISPATCH_ERROR = 'dispatcher.event.dispatcher-error';
+	const EVENT_RESPONSE       = 'dispatcher.event.response';
+	const EVENT_DISPATCH       = 'dispatcher.event.dispatch';
+	const EVENT_REQUEST        = 'dispatcher.event.request';
+	const EVENT_RENDER         = 'dispatcher.event.render';
+	const EVENT_ROUTE          = 'dispatcher.event.route';
 
 	/**
 	 * errors type

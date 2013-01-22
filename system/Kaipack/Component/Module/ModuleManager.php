@@ -26,7 +26,7 @@ class ModuleManager extends ComponentAbstract
 		// Установить полный путь к модулям проекта.
 		$modulesRealDir = $cm->getParam('base-dir') . $cm->getParam('module.module-dir');
 
-		if (!is_dir($modulesRealDir) && !is_readable($modulesRealDir)) {
+		if (!is_readable($modulesRealDir)) {
 			throw new \Exception(sprintf(
 				'Каталог модулей "%s" не найден или он не доступен для чтения',
 				$modulesRealDir
@@ -40,11 +40,11 @@ class ModuleManager extends ComponentAbstract
 		$classLoader = $cm->get('class-loader');
 		$classLoader->add('module', $cm->getParam('module.module-dir'));
 
-		$cache	= $cm->get('cache.filesystem');
+		$cache  = $cm->get('cache.filesystem');
 		$config = $cm->get('config');
 
 		if (!$cache->hasItem('modules-loaded')) {
-			$model = $cm->get('database.database-manager')->getModel('kaipack/module');
+			$model   = $cm->get('database.database-manager')->getModel('kaipack/module');
 			$modules = $model->getActivatedModules();
 
 			foreach($modules as $module) {
@@ -80,7 +80,7 @@ class ModuleManager extends ComponentAbstract
 
 				$this->_modules[$module->name] = array(
 					'class' => $moduleClass,
-					'dir' => $moduleDir
+					'dir'   => $moduleDir
 				);
 			}
 

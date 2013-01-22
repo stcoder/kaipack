@@ -39,8 +39,8 @@ class Engine
 		$this->_componentManager->setParam('engine.charset', 'utf-8');
 
 		// регистрируем менеджер событий
-		$this->_event			= new EngineEvent();
-		$this->_eventManager	= new EventManager();
+		$this->_event        = new EngineEvent();
+		$this->_eventManager = new EventManager();
 
 		$this->_event->setComponentManager($this->_componentManager);
 		$this->_componentManager->set('event-manager', $this->_eventManager);
@@ -114,8 +114,8 @@ class Engine
 	 */
 	public function run()
 	{
-		$this->_eventManager->trigger(EngineEvent::ENGINE_START,	 $this, $this->_event);
+		$this->_eventManager->trigger(EngineEvent::ENGINE_START,     $this, $this->_event);
 		$this->_eventManager->trigger(EngineEvent::ENGINE_BOOTSTRAP, $this, $this->_event);
-		$this->_eventManager->trigger(EngineEvent::ENGINE_STOP,		 $this, $this->_event);
+		$this->_eventManager->trigger(EngineEvent::ENGINE_STOP,      $this, $this->_event);
 	}
 }

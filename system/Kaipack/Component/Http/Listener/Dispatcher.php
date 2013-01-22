@@ -45,8 +45,8 @@ class Dispatcher implements ListenerAggregateInterface
 
 	public function onDispatch(EngineEvent $e)
 	{
-		$em	= $e->getComponentManager()->get('event-manager');
-		$ed	= $e->getComponentManager()->get('event-dispatcher');
+		$em = $e->getComponentManager()->get('event-manager');
+		$ed = $e->getComponentManager()->get('event-dispatcher');
 
 		// Запускаем всех слушателей подписанных на событие EVENT_REQUEST дипетчера событий.
 		// На данное событие могут быть подписаны например: плагины или другие компоненты.
@@ -54,8 +54,8 @@ class Dispatcher implements ListenerAggregateInterface
 		$em->trigger(DispatcherEvent::EVENT_REQUEST, $ed);
 
 		// Получаем измененный параметр request.
-		$request = $ed->getParam('request');
-
+		$request  = $ed->getParam('request');
+		
 		$response = $ed->getParam('response');
 
 		// Запускаем всех слушателей подписанных на событие EVENT_ROUTE диспетчера событий.
@@ -99,8 +99,8 @@ class Dispatcher implements ListenerAggregateInterface
 		$em->trigger(DispatcherEvent::EVENT_RENDER, $e);
 		$em->trigger(DispatcherEvent::EVENT_RESPONSE, $e);
 
-		$response	= $e->getParam('response');
-		$request	= $e->getParam('request');
+		$response = $e->getParam('response');
+		$request  = $e->getParam('request');
 
 		$response->prepare($request);
 		return $response;

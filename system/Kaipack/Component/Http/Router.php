@@ -8,11 +8,11 @@ class Router
 	 * @var array
 	 */
 	protected $_routes = array(
-		'get'		=> [],
-		'post'		=> [],
-		'put'		=> [],
-		'delete'	=> [],
-		'head'		=> []
+		'get'    => [],
+		'post'   => [],
+		'put'    => [],
+		'delete' => [],
+		'head'   => []
 	);
 
 	/**

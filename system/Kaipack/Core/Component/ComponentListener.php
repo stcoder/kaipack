@@ -40,9 +40,9 @@ class ComponentListener implements ListenerAggregateInterface
 
 	public function onLoadComponents(EngineEvent $e)
 	{
-		$cm		= $e->getComponentManager();
-		$cache	= $this->_cache = $cm->get('cache.filesystem');
-		$config	= $cm->get('config');
+		$cm     = $e->getComponentManager();
+		$cache  = $this->_cache = $cm->get('cache.filesystem');
+		$config = $cm->get('config');
 
 		$componentsConfig = [];
 
@@ -81,7 +81,7 @@ class ComponentListener implements ListenerAggregateInterface
 		foreach($componentsConfig as $component => $componentConfig) {
 
 			$parameters = isset($componentConfig->parameters) ? $componentConfig->parameters : [];
-			$services	= isset($componentConfig->services) ? $componentConfig->services : [];
+			$services   = isset($componentConfig->services) ? $componentConfig->services : [];
 
 			// Определяем параметры.
 			$this->_setParams($component, $parameters, $cm);
@@ -154,8 +154,8 @@ class ComponentListener implements ListenerAggregateInterface
 					continue;
 				}
 
-				$bootClass	= $componentConfig->boot->class;
-				$boot		= new $bootClass;
+				$bootClass = $componentConfig->boot->class;
+				$boot      = new $bootClass;
 
 				if (!($boot instanceof ComponentAbstract)) {
 					throw new \DomainException(sprintf(

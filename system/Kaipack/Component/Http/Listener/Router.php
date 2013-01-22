@@ -37,7 +37,7 @@ class Router implements ListenerAggregateInterface
 
 	public function onRouteBoot(EngineEvent $e)
 	{
-		$cm		= $e->getComponentManager();
+		$cm     = $e->getComponentManager();
 		$router = $cm->get('http.router');
 		$config = $cm->get('config');
 
@@ -52,9 +52,9 @@ class Router implements ListenerAggregateInterface
 
 	public function onRouteMatch(DispatcherEvent $e)
 	{
-		$cm			= $e->getComponentManager();
-		$routes		= $cm->get('http.router')->getRoutes();
-		$request	= $cm->get('http.request');
+		$cm      = $e->getComponentManager();
+		$routes  = $cm->get('http.router')->getRoutes();
+		$request = $cm->get('http.request');
 
 		$method = strtolower($request->getMethod());
 

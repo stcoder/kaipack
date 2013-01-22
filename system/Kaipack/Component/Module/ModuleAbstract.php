@@ -41,9 +41,9 @@ abstract class ModuleAbstract
 
 	public function dispatch()
 	{
-		$e		= $this->_componentManager->get('event-dispatcher');
-		$vm		= $this->_componentManager->get('view.view-manager');
-		$route	= $e->getParam('route');
+		$e     = $this->_componentManager->get('event-dispatcher');
+		$vm    = $this->_componentManager->get('view.view-manager');
+		$route = $e->getParam('route');
 
 		// Определяем контроллер.
 		$namespace = get_class($this);

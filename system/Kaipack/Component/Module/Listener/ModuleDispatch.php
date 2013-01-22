@@ -43,9 +43,9 @@ class ModuleDispatch implements ListenerAggregateInterface
 
 	public function onDispatch(DispatcherEvent $e)
 	{
-		$em = $e->getComponentManager()->get('event-manager');
-		$mm = $e->getComponentManager()->get('module.module-manager');
 		$route = $e->getParam('route');
+		$em    = $e->getComponentManager()->get('event-manager');
+		$mm    = $e->getComponentManager()->get('module.module-manager');
 
 		$moduleOptions = $mm->getModule($route->getModule());
 

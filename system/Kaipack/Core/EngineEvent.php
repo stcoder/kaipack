@@ -6,9 +6,9 @@ use Zend\EventManager\Event;
 
 class EngineEvent extends Event
 {
-	const ENGINE_BOOTSTRAP	= 'engine.event.bootstrap';
-	const ENGINE_START		= 'engine.event.start';
-	const ENGINE_STOP		= 'engine.event.stop';
+	const ENGINE_BOOTSTRAP = 'engine.event.bootstrap';
+	const ENGINE_START     = 'engine.event.start';
+	const ENGINE_STOP      = 'engine.event.stop';
 
 	/**
 	 * @var Component\ComponentManager

@@ -33,9 +33,8 @@ class Dispatcher extends ComponentAbstract
 	 */
 	public function boot()
     {
-        $this->_request = $this->getComponentManager()->get('http.request');
-
-        $this->_response = $this->getComponentManager()->get('http.response');
+		$this->_request  = $this->getComponentManager()->get('http.request');
+		$this->_response = $this->getComponentManager()->get('http.response');
 
 		$this->_event = new DispatcherEvent();
 		$this->_event->setParam('request', $this->_request);
