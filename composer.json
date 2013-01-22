@@ -1,0 +1,9 @@
+{
+	"require": {
+		"zendframework/zendframework": "2.*",
+		"twig/twig": "1.12.*@dev",
+		"symfony/dependency-injection": "dev-master",
+		"symfony/http-foundation": "dev-master",
+		"symfony/event-dispatcher": "dev-master"
+	}
+}

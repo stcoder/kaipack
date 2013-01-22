@@ -1,0 +1,30 @@
+{
+	"application": {
+		"debug": true
+	},
+
+	"router": {
+		"routes": {
+			"home": "get / main@index:home"
+		}
+	},
+
+	"cache": {
+		"adapters": {
+			"filesystem": {
+				"cache_dir": "/misc/cache"
+			}
+		}
+	},
+
+	"components": {
+		"database": {
+			"options": {
+				"database": "",
+				"hostname": "",
+				"username": "",
+				"password": ""
+			}
+		}
+	}
+}
