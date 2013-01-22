@@ -1,39 +1,39 @@
 {
-	"name": "database",
+    "name": "database",
 
-	"boot": {
-		"name": "database-manager",
-		"class": "\\Kaipack\\Component\\Database\\DatabaseManager"
-	},
+    "boot": {
+        "name": "database-manager",
+        "class": "\\Kaipack\\Component\\Database\\DatabaseManager"
+    },
 
-	"parameters": {
-		"model-dir": "/application",
-		"options": {
-			"driver": "Pdo_Mysql",
-			"database": "",
-			"hostname": "",
-			"port": 3306,
-			"username": "",
-			"password": "",
-			"charset": "%engine.charset%"
-		}
-	},
+    "parameters": {
+        "model-dir": "/application",
+        "options": {
+            "driver": "Pdo_Mysql",
+            "database": "",
+            "hostname": "",
+            "port": 3306,
+            "username": "",
+            "password": "",
+            "charset": "%engine.charset%"
+        }
+    },
 
-	"services": {
-		"db-adapter": {
-			"class": "\\Zend\\Db\\Adapter\\Adapter",
-			"arguments": [{
-				"driver": "%database.options.driver%",
+    "services": {
+        "db-adapter": {
+            "class": "\\Zend\\Db\\Adapter\\Adapter",
+            "arguments": [{
+                "driver": "%database.options.driver%",
 
-				"database": "%database.options.database%",
-				"hostname": "%database.options.hostname%",
-				"port": "%database.options.port%",
+                "database": "%database.options.database%",
+                "hostname": "%database.options.hostname%",
+                "port": "%database.options.port%",
 
-				"username": "%database.options.username%",
-				"password": "%database.options.password%",
+                "username": "%database.options.username%",
+                "password": "%database.options.password%",
 
-				"charset": "%database.options.charset%"
-			}]
-		}
-	}
+                "charset": "%database.options.charset%"
+            }]
+        }
+    }
 }

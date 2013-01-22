@@ -1,46 +1,46 @@
 {
-	"name": "view",
+    "name": "view",
 
-	"boot": {
-		"name": "view-manager",
-		"class": "\\Kaipack\\Component\\View\\ViewManager"
-	},
+    "boot": {
+        "name": "view-manager",
+        "class": "\\Kaipack\\Component\\View\\ViewManager"
+    },
 
-	"parameters": {
-		"template-dir": "/application/templates",
-		"options": {
-			"debug": false,
-			"charset": "%engine.charset%",
-			"base_template_class": "Twig_Template",
-			"strict_variables": false,
-			"autoescape": "html",
-			"cache": "/misc/cache-template",
-			"auto_reload": 1,
-			"optimizations": -1
-		}
-	},
+    "parameters": {
+        "template-dir": "/application/templates",
+        "options": {
+            "debug": false,
+            "charset": "%engine.charset%",
+            "base_template_class": "Twig_Template",
+            "strict_variables": false,
+            "autoescape": "html",
+            "cache": "/misc/cache-template",
+            "auto_reload": 1,
+            "optimizations": -1
+        }
+    },
 
-	"services": {
-		"twig-loader": {
-			"class": "\\Twig_Loader_Filesystem",
-			"arguments": "%view.template-dir%"
-		},
+    "services": {
+        "twig-loader": {
+            "class": "\\Twig_Loader_Filesystem",
+            "arguments": "%view.template-dir%"
+        },
 
-		"twig-environment": {
-			"class": "\\Twig_Environment",
-			"arguments": [
-				"@view.twig-loader",
-				{
-					"debug": "%view.options.debug%",
-					"charset": "%view.options.charset%",
-					"base_template_class": "%view.options.base_template_class%",
-					"strict_variables": "%view.options.strict_variables%",
-					"autoescape": "%view.options.autoescape%",
-					"cache": "%view.options.cache%",
-					"auto_reload": "%view.options.auto_reload%",
-					"optimizations": "%view.options.optimizations%"
-				}
-			]
-		}
-	}
+        "twig-environment": {
+            "class": "\\Twig_Environment",
+            "arguments": [
+                "@view.twig-loader",
+                {
+                    "debug": "%view.options.debug%",
+                    "charset": "%view.options.charset%",
+                    "base_template_class": "%view.options.base_template_class%",
+                    "strict_variables": "%view.options.strict_variables%",
+                    "autoescape": "%view.options.autoescape%",
+                    "cache": "%view.options.cache%",
+                    "auto_reload": "%view.options.auto_reload%",
+                    "optimizations": "%view.options.optimizations%"
+                }
+            ]
+        }
+    }
 }

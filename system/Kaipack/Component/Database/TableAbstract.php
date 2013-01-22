@@ -7,15 +7,15 @@ use Zend\Db\TableGateway\TableGateway;
 
 abstract class TableAbstract extends TableGateway
 {
-	/**
-	 * Имя таблицы.
-	 *
-	 * @var string
-	 */
-	protected $_name;
+    /**
+     * Имя таблицы.
+     *
+     * @var string
+     */
+    protected $_name;
 
-	public function __construct(Adapter $adapter)
-	{
-		parent::__construct($this->_name, $adapter);
-	}
+    public function __construct(Adapter $adapter)
+    {
+        parent::__construct($this->_name, $adapter);
+    }
 }

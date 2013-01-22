@@ -4,8 +4,8 @@ namespace Module\Admin\Controller;
 
 class IndexController
 {
-	public function homeAction()
-	{
-		return [];
-	}
+    public function homeAction()
+    {
+        return [];
+    }
 }

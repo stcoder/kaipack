@@ -1,14 +1,14 @@
 {
     "name": "module",
 
-	"boot": {
-		"name": "module-manager",
-		"class": "\\Kaipack\\Component\\Module\\ModuleManager"
-	},
+    "boot": {
+        "name": "module-manager",
+        "class": "\\Kaipack\\Component\\Module\\ModuleManager"
+    },
 
-	"parameters": {
-		"module-dir": "/application"
-	},
+    "parameters": {
+        "module-dir": "/application"
+    },
 
     "services": []
 }

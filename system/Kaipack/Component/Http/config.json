@@ -1,25 +1,25 @@
 {
-	"name": "http",
+    "name": "http",
 
     "boot": {
         "name": "dispatcher",
         "class": "\\Kaipack\\Component\\Http\\Dispatcher"
     },
 
-	"services": {
+    "services": {
 
-		"router": {
-			"class": "\\Kaipack\\Component\\Http\\Router"
-		},
+        "router": {
+            "class": "\\Kaipack\\Component\\Http\\Router"
+        },
 
-		"request": {
-			"class": "\\Symfony\\Component\\HttpFoundation\\Request",
+        "request": {
+            "class": "\\Symfony\\Component\\HttpFoundation\\Request",
             "factoryMethod": "createFromGlobals"
-		},
+        },
 
-		"response": {
-			"class": "\\Symfony\\Component\\HttpFoundation\\Response"
-		}
+        "response": {
+            "class": "\\Symfony\\Component\\HttpFoundation\\Response"
+        }
 
-	}
+    }
 }
