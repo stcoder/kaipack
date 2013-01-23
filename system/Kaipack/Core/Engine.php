@@ -1,17 +1,27 @@
 <?php
 
+/**
+ * Kaipack
+ * 
+ * @package kaipack/core
+ */
 namespace Kaipack\Core;
 
 use Zend\EventManager\EventManager;
-use Zend\Cache\StorageFactory;
 
+/**
+ * Движок ядра системы.
+ * 
+ * Основной класс системы kaipack. 
+ * Подключаем конфиг проекта, инициализируем основные компоненты и
+ * регистрируем слушателей на события ядра.
+ * 
+ * @author Sergey Tihonov
+ * @package kaipack/core
+ * @version 1.1-a2
+ */
 class Engine
 {
-    /**
-     * @var Component\ComponentManager
-     */
-    protected $_componentManager;
-
     /**
      * @var \Composer\Autoload\ClassLoader
      */
@@ -27,67 +37,140 @@ class Engine
      */
     protected $_event;
 
-    public function __construct()
+    /**
+     * @var Config
+     */
+    protected $_config;
+
+    /**
+     * @var string
+     */
+    protected $_componentDir;
+
+    /**
+     * @var string
+     */
+    protected $_baseDir;
+
+    /**
+     * @var array
+     */
+    protected $_cache;
+
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+     */
+    protected $_container;
+
+    /**
+     * @var \Zend\Cache\Storage\Adapter\AbstractAdapter
+     */
+    protected $_storageComponents;
+
+    /**
+     * Конуструктор движка.
+     * 
+     * @param string $configPath
+     */
+    public function __construct($configPath)
     {
-        $this->_componentManager = new Component\ComponentManager();
+        // Подключаем конфиг.
+        $this->_config = new Config($configPath);
 
-        $base_dir = dirname($_SERVER['SCRIPT_FILENAME']);
-        $component_dir = __DIR__ . '/../Component';
-
-        $this->_componentManager->setParam('base-dir', $base_dir);
-        $this->_componentManager->setParam('component-dir', $component_dir);
-        $this->_componentManager->setParam('engine.charset', 'utf-8');
-
-        // регистрируем менеджер событий
-        $this->_event        = new EngineEvent();
+        // Определяем менеджер событий.
         $this->_eventManager = new EventManager();
 
-        $this->_event->setComponentManager($this->_componentManager);
-        $this->_componentManager->set('event-manager', $this->_eventManager);
+        // Определяем события движка.
+        $this->_event = new EngineEvent();
+        $this->_event->setTarget($this);
+        $this->setBaseDir(dirname($_SERVER['SCRIPT_FILENAME']));
+        $this->setComponentDir(__DIR__ . '/../Component');
 
-        // регистрируем конфиг
-        $this->_componentManager->definitionComponent('config.factory', '\\Kaipack\\Core\\Config');
-
-        $configDefinition = $this->_componentManager->getDefinitionComponent('config.factory');
-        $configDefinition->setArguments(array(
-            $this->_componentManager->getParam('base-dir') . '/config/project.config.json'
-        ));
-
-        $config = $this->_componentManager->get('config.factory');
-        $this->_componentManager->set('config', $config);
-
-        // регистрируем кэш
-        if (isset($config->cache->adapters) && !empty($config->cache->adapters)) {
-
-            foreach($config->cache->adapters as $adapterName => $options) {
-
-                $adapterName = strtolower($adapterName);
-
-                $options = $options->toArray();
-
-                if ($adapterName === 'filesystem') {
-                    $cache_dir = (isset($options['cache_dir'])) ? $options['cache_dir'] : '/misc/cache';
-                    $cache_dir = $this->_componentManager->getParam('base-dir') . $cache_dir;
-                    $options['cache_dir'] = $cache_dir;
-                }
-
-
-                $cacheFactory = StorageFactory::adapterFactory($adapterName, $options);
-                $this->_componentManager->set('cache.' . $adapterName, $cacheFactory);
-
-            }
-
-        }
-
-        $this->_componentManager->process();
+        // Регистрируем слушателей.
+        $this->_eventManager->attachAggregate(new Listener\CacheListener());
+        $this->_eventManager->attachAggregate(new Listener\ComponentListener());
     }
 
     /**
-     * @return Component\ComponentManager
+     * @return \Zend\EventManager\EventManager
      */
-    public function getComponentManager()
+    public function getEventManager()
     {
-        return $this->_componentManager;
+        return $this->_eventManager;
+    }
+
+    /**
+     * @param string $dir
+     * @return Engine
+     */
+    public function setComponentDir($dir)
+    {
+        $this->_componentDir = $dir;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComponentDir()
+    {
+        return $this->_componentDir;
+    }
+
+    /**
+     * @param $dir
+     * @return Engine
+     */
+    public function setBaseDir($dir)
+    {
+        $this->_baseDir = $dir;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseDir()
+    {
+        return $this->_baseDir;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug()
+    {
+        if (isset($this->_config->parameters->debug) && $this->_config->parameters->debug === false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->_config;
+    }
+
+    /**
+     * @param array $cache
+     * @return Engine
+     */
+    public function setCache($cache)
+    {
+        $this->_cache = $cache;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCache()
+    {
+        return $this->_cache;
     }
 
     /**
@@ -96,7 +179,6 @@ class Engine
      */
     public function setClassLoader(\Composer\Autoload\ClassLoader $loader)
     {
-        $this->_componentManager->set('class-loader', $loader);
         $this->_loader = $loader;
         return $this;
     }
@@ -107,6 +189,53 @@ class Engine
     public function getClassLoader()
     {
         return $this->_loader;
+    }
+
+    /**
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @return Engine
+     */
+    public function setContainer(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
+    {
+        $this->_container = $container;
+        return $this;
+    }
+
+    /**
+     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+     */
+    public function getContainer()
+    {
+        return $this->_container;
+    }
+
+    /**
+     * @return \Zend\Cache\Storage\Adapter\AbstractAdapter
+     */
+    public function getStorageComponents()
+    {
+        if ($this->_storageComponents) {
+            return $this->_storageComponents;
+        }
+
+        $cacheAdapters = $this->getCache();
+
+        $storage_components = '';
+        if (isset($this->_config->parameters->storage_components)) {
+            $storage_components = $this->_config->parameters->storage_components;
+        }
+
+        $storage_components = ($storage_components)?:'filesystem';
+
+        if (!isset($cacheAdapters[$storage_components])) {
+            throw new \Exception(sprintf(
+                'Для хранилища компонентов используется неизвестный адаптер "%s" кэша',
+                $storage_components
+            ));
+        }
+
+        $this->_storageComponents = $cacheAdapters[$storage_components];
+        return $this->_storageComponents;
     }
 
     /**

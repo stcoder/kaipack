@@ -1,3 +1,8 @@
 <!DOCTYPE html>
 <title>Page not found</title>
-<h1>Page not found</h1>
+<h1>{{ message }}</h1>
+
+{% if exception_message %}
+<p>{{ exception_message }}</p>
+<pre>{{ exception_trace }}</pre>
+{% endif %}

@@ -18,10 +18,10 @@ class DatabaseManager extends ComponentAbstract
 
     public function boot()
     {
-        $cm = $this->getComponentManager();
+        $container = $this->getContainer();
 
         // Установить полный путь к моделям.
-        $modelsRealDir = $cm->getParam('base-dir') . $cm->getParam('database.model-dir');
+        $modelsRealDir = $container->getParameter('base-dir') . $container->getParameter('database.model-dir');
 
         if (!is_dir($modelsRealDir) && !is_readable($modelsRealDir)) {
             throw new \Exception(sprintf(
@@ -31,16 +31,16 @@ class DatabaseManager extends ComponentAbstract
         }
 
         // Переопределяем параметр директории моделей.
-        $cm->setParam('database.model-dir', $modelsRealDir);
+        $container->setParameter('database.model-dir', $modelsRealDir);
 
-        $adapter = $this->_adapter = $this->getComponentManager()->get('database.db-adapter');
+        $adapter = $this->_adapter = $container->get('database.db-adapter');
 
         // Подключаемся к базе данных.
         $adapter->driver->getConnection()->connect();
 
         // Добавляем префикс и директорию моделей в загрузчик классов.
-        $classLoader = $cm->get('class-loader');
-        $classLoader->add('model', $cm->getParam('database.model-dir'));
+        $classLoader = $container->get('class-loader');
+        $classLoader->add('model', $container->getParameter('database.model-dir'));
     }
 
     /**
@@ -54,8 +54,8 @@ class DatabaseManager extends ComponentAbstract
             return $this->_models[$modelName];
         }
 
-        $modelClass    = strtr($modelName, array('/' => ' '));
-        $modelClass    = ucwords($modelClass);
+        $modelClass = strtr($modelName, array('/' => ' '));
+        $modelClass = ucwords($modelClass);
         $modelClass = '\\model\\' . strtr($modelClass, array(' ' => '\\'));
 
         $model = new $modelClass($this->_adapter);

@@ -10,7 +10,7 @@
         "template-dir": "/application/templates",
         "options": {
             "debug": false,
-            "charset": "%engine.charset%",
+            "charset": "%charset%",
             "base_template_class": "Twig_Template",
             "strict_variables": false,
             "autoescape": "html",

@@ -1,23 +1,34 @@
 <?php
 
+/**
+ * Kaipack component.
+ *
+ * @package kaipack/component/http
+ */
 namespace Kaipack\Component\Http;
 
 use Kaipack\Core\Component\ComponentAbstract;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
- * Компонент диспетчер.
+ * Загрузчик компонента Http.
+ *
+ * Регистрирует слушателей на события диспетчера.
+ *
+ * @author Sergey Tihonov
+ * @package kaipack/component/http
+ * @version 1.1-a2
  */
 class Dispatcher extends ComponentAbstract
 {
-    /**
-     * @var object
-     */
-    protected $_request;
-
-    /**
-     * @var object
-     */
-    protected $_response;
+    const ERROR_CONTROLLER_CANNOT_DISPATCH = 'error-controller-cannot-dispatch';
+    const ERROR_CONTROLLER_NOT_FOUND       = 'error-controller-not-found';
+    const ERROR_CONTROLLER_INVALID         = 'error-controller-invalid';
+    const ERROR_MODULE_INVALID             = 'error-module-invalid';
+    const ERROR_EXCEPTION                  = 'error-exception';
+    const ERROR_ROUTER_NO_MATCH            = 'error-router-no-match';
 
     /**
      * @var \Kaipack\Component\Http\DispatcherEvent
@@ -33,20 +44,19 @@ class Dispatcher extends ComponentAbstract
      */
     public function boot()
     {
-        $this->_request  = $this->getComponentManager()->get('http.request');
-        $this->_response = $this->getComponentManager()->get('http.response');
+        $container = $this->getContainer();
+        $em        = $container->get('event-manager');
 
         $this->_event = new DispatcherEvent();
-        $this->_event->setParam('request', $this->_request);
-        $this->_event->setParam('response', $this->_response);
-        $this->_event->setComponentManager($this->getComponentManager());
+        $this->_event->setTarget($this);
+        $this->_event->setRequest($container->get('http.request'));
+        $this->_event->setResponse($container->get('http.response'));
 
-        $this->getComponentManager()->set('event-dispatcher', $this->_event);
-        $em = $this->getComponentManager()->get('event-manager');
+        $container->set('event-dispatcher', $this->_event);
 
         // Регистрируем слушателей.
-        $em->attachAggregate(new Listener\Dispatcher());
-        $em->attachAggregate(new Listener\Response());
-        $em->attachAggregate(new Listener\Router());
+        $em->attachAggregate(new Listener\DispatcherListener());
+        $em->attachAggregate(new Listener\ResponseListener());
+        $em->attachAggregate(new Listener\RouterListener());
     }
 }

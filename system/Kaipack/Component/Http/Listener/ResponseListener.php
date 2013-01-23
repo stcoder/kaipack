@@ -4,10 +4,12 @@ namespace Kaipack\Component\Http\Listener;
 
 use Kaipack\Component\Http\DispatcherEvent;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 
-class Response implements ListenerAggregateInterface
+class ResponseListener implements ListenerAggregateInterface
 {
     /**
      * @var array
@@ -24,7 +26,7 @@ class Response implements ListenerAggregateInterface
      */
     public function attach(EventManagerInterface $events)
     {
-        $this->_handlers[] = $events->attach(DispatcherEvent::EVENT_RESPONSE, array($this, 'onResponse'), -1000);
+        $this->_handlers[] = $events->attach(DispatcherEvent::EVENT_RESPONSE, array($this, 'onResponse'), -10000);
     }
 
     /**
@@ -41,8 +43,11 @@ class Response implements ListenerAggregateInterface
 
     public function onResponse(DispatcherEvent $e)
     {
-        $response = $e->getComponentManager()->get('http.response');
-        $response->setContent($e->getResult());
+        $response = $e->getResponse();
+        if (!$response instanceof Response) {
+            return false;
+        }
+
         $response->send();
     }
 }

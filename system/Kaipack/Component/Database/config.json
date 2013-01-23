@@ -15,7 +15,7 @@
             "port": 3306,
             "username": "",
             "password": "",
-            "charset": "%engine.charset%"
+            "charset": "%charset%"
         }
     },
 

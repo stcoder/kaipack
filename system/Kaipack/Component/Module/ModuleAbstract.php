@@ -2,31 +2,127 @@
 
 namespace Kaipack\Component\Module;
 
-use Kaipack\Core\Component\ComponentManager;
+use Kaipack\Component\Module\Controller\ControllerAbstract;
+use Kaipack\Component\Http\DispatcherEvent;
+use Kaipack\Core\Config;
+use Zend\EventManager\EventManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class ModuleAbstract
 {
     /**
-     * @var \Kaipack\Core\Component\ComponentManager
+     * @var \Kaipack\Core\Config
      */
-    protected $_componentManager;
+    protected $_localConfig;
 
     /**
-     * @param \Kaipack\Core\Component\ComponentManager $cm
+     * @var \Kaipack\Core\Config
+     */
+    protected $_config;
+
+    /**
+     * @var \Kaipack\Component\Http\DispatcherEvent
+     */
+    protected $_event;
+
+    /**
+     * @var \Zend\EventManager\EventManager
+     */
+    protected $_eventManager;
+
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+     */
+    protected $_container;
+
+    /**
+     * @param \Kaipack\Core\Config $config
      * @return ModuleAbstract
      */
-    public function setComponentManager(ComponentManager $cm)
+    public function setConfig(Config $config)
     {
-        $this->_componentManager = $cm;
+        $this->_config;
         return $this;
     }
 
     /**
-     * @return \Kaipack\Core\Component\ComponentManager
+     * @return \Kaipack\Core\Config
      */
-    public function getComponentManager()
+    public function getConfig()
     {
-        return $this->_componentManager;
+        return $this->_config;
+    }
+
+    /**
+     * @param string $config
+     * @return ModuleAbstract
+     */
+    public function setLocalConfig($config)
+    {
+        $this->_localConfig = new Config($config);
+        return $this;
+    }
+
+    /**
+     * @return \Kaipack\Core\Config
+     */
+    public function getLocalConfig()
+    {
+        return $this->_localConfig;
+    }
+
+    /**
+     * @param \Kaipack\Component\Http\DispatcherEvent $event
+     * @return ModuleAbstract
+     */
+    public function setEvent(DispatcherEvent $event)
+    {
+        $this->_event = $event;
+        return $this;
+    }
+
+    /**
+     * @return \Kaipack\Component\Http\DispatcherEvent
+     */
+    public function getEvent()
+    {
+        return $this->_event;
+    }
+
+    /**
+     * @param \Zend\EventManager\EventManager $em
+     * @return ModuleAbstract
+     */
+    public function setEventManager(EventManager $em)
+    {
+        $this->_eventManager = $em;
+        return $this;
+    }
+
+    /**
+     * @return \Zend\EventManager\EventManager
+     */
+    public function getEventManager()
+    {
+        return $this->_eventManager;
+    }
+
+    /**
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @return ModuleAbstract
+     */
+    public function setContainer(ContainerBuilder $container)
+    {
+        $this->_container = $container;
+        return $this;
+    }
+
+    /**
+     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+     */
+    public function getContainer()
+    {
+        return $this->_container;
     }
 
     /**
@@ -41,11 +137,7 @@ abstract class ModuleAbstract
 
     public function dispatch()
     {
-        $e     = $this->_componentManager->get('event-dispatcher');
-        $vm    = $this->_componentManager->get('view.view-manager');
-        $route = $e->getParam('route');
-
-        // Определяем контроллер.
+        $route     = $this->getEvent()->getRoute();
         $namespace = get_class($this);
         $namespace = lcfirst(substr($namespace, 0, strrpos($namespace, '\\')));
         $controllerClass = sprintf(
@@ -56,11 +148,24 @@ abstract class ModuleAbstract
 
         $controller = new $controllerClass;
 
-        // Определяем действие.
-        $action = lcfirst($this->_normalize($route->getAction())) . 'Action';
+        if ($controller instanceof ControllerAbstract) {
+            $controller->setContainer($this->getContainer())
+                ->setEvent($this->getEvent())
+                ->setEventManager($this->getEventManager())
+                ->setResponse($this->getEvent()->getResponse())
+                ->setRequest($this->getEvent()->getRequest());
+            $controller->init();
+        }
 
+        $action = lcfirst($this->_normalize($route->getAction())) . 'Action';
         if (!method_exists($controller, $action)) {
-            $action = 'notFoundAction';
+            $this->getEvent()->setError(\Kaipack\Component\Http\Dispatcher::ERROR_CONTROLLER_NOT_FOUND);
+            throw new \Exception(sprintf(
+                'Был запрошен неизвестный метод (%s). Модуль "%s" контроллер "%s"',
+                $action,
+                get_class($this),
+                get_class($controller)
+            ));
         }
 
         $arguments = [];
@@ -77,16 +182,7 @@ abstract class ModuleAbstract
             return $actionResult;
         }
 
-        // Устанавливаем шаблон.
-        if (!$vm->getTemplate()) {
-            $vm->setTemplate(sprintf(
-                'modules/%s/%s/%s',
-                $route->getModule(),
-                $route->getController(),
-                $route->getAction()
-            ));
-        }
-
+        $this->getEvent()->setResult($actionResult);
         return $actionResult;
     }
 

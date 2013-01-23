@@ -2,28 +2,32 @@
 
 namespace Kaipack\Core\Component;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 abstract class ComponentAbstract
 {
     /**
-     * @var ComponentManager
+     * @var \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    protected $_componentManager;
+    protected $_container;
 
     /**
-     * @param ComponentManager $cm
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      * @return ComponentAbstract
      */
-    public function setComponentManager(ComponentManager $cm)
+    public function setContainer(ContainerBuilder $container)
     {
-        $this->_componentManager = $cm;
+        $this->_container = $container;
         return $this;
     }
 
     /**
-     * @return ComponentManager
+     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    public function getComponentManager()
+    public function getContainer()
     {
-        return $this->_componentManager;
+        return $this->_container;
     }
+
+    abstract public function boot();
 }

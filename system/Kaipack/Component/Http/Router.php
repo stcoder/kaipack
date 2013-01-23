@@ -7,13 +7,7 @@ class Router
     /**
      * @var array
      */
-    protected $_routes = array(
-        'get'    => [],
-        'post'   => [],
-        'put'    => [],
-        'delete' => [],
-        'head'   => []
-    );
+    protected $_routes = [];
 
     /**
      * @param Router\Route $route
@@ -21,7 +15,7 @@ class Router
      */
     public function addRoute(Router\Route $route)
     {
-        $this->_routes[$route->getMethod()][] = $route;
+        $this->_routes[] = $route;
         return $this;
     }
 

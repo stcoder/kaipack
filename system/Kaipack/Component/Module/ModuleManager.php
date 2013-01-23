@@ -21,10 +21,10 @@ class ModuleManager extends ComponentAbstract
      */
     public function boot()
     {
-        $cm = $this->getComponentManager();
+        $container = $this->getContainer();
 
         // Установить полный путь к модулям проекта.
-        $modulesRealDir = $cm->getParam('base-dir') . $cm->getParam('module.module-dir');
+        $modulesRealDir = $container->getParameter('base-dir') . $container->getParameter('module.module-dir');
 
         if (!is_readable($modulesRealDir)) {
             throw new \Exception(sprintf(
@@ -34,66 +34,23 @@ class ModuleManager extends ComponentAbstract
         }
 
         // Переопределяем параметр директории модулей.
-        $cm->setParam('module.module-dir', $modulesRealDir);
+        $container->setParameter('module.module-dir', $modulesRealDir);
 
-        // Добавляем префикс и директорию модулей в загрузчик классов.
-        $classLoader = $cm->get('class-loader');
-        $classLoader->add('module', $cm->getParam('module.module-dir'));
+        $classLoader = $container->get('class-loader');
+        $classLoader->add('module', $container->getParameter('module.module-dir'));
 
-        $cache  = $cm->get('cache.filesystem');
-        $config = $cm->get('config');
+        $em = $container->get('event-manager');
+        $em->attach(new Listener\ModuleListener());
+    }
 
-        if (!$cache->hasItem('modules-loaded')) {
-            $model   = $cm->get('database.database-manager')->getModel('kaipack/module');
-            $modules = $model->getActivatedModules();
-
-            foreach($modules as $module) {
-                $moduleName = ucfirst($module->name);
-                $moduleClass = sprintf(
-                    '\\module\\%s\\%sModule',
-                    $moduleName,
-                    $moduleName
-                );
-
-                $moduleDir = sprintf('%s/module/%s', $modulesRealDir, $moduleName);
-
-                // Файл конфигурации.
-                $configFile = $moduleDir . '/config.json';
-                if (is_file($configFile)) {
-                    $configDefinition = $cm->getDefinitionComponent('config.factory');
-                    $configDefinition->setArguments(array(
-                        $configFile
-                    ));
-
-                    $moduleConfig = $cm->getInstance('config.factory');
-
-                    // Установка маршрутов.
-                    if (isset($moduleConfig->router->routes) && !empty($moduleConfig->router->routes)) {
-                        $router = $cm->get('http.router');
-                        foreach($moduleConfig->router->routes as $routeName => $routeOptions) {
-                            $route = new \Kaipack\Component\Http\Router\Route($routeName, $routeOptions);
-                            $route->setModule($module->name);
-                            $router->addRoute($route);
-                        }
-                    }
-                }
-
-                $this->_modules[$module->name] = array(
-                    'class' => $moduleClass,
-                    'dir'   => $moduleDir
-                );
-            }
-
-            if (isset($config->application->debug) && $config->application->debug === false) {
-                $cache->setItem('modules-loaded', serialize($this->_modules));
-            }
-        } else {
-            $this->_modules = unserialize($cache->getItem('modules-loaded'));
-        }
-
-        // Регистрируем слушателей.
-        $em = $cm->get('event-manager');
-        $em->attach(new Listener\ModuleDispatch());
+    /**
+     * @param  array $modules
+     * @return ModuleManager
+     */
+    public function setModules($modules)
+    {
+        $this->_modules = $modules;
+        return $this;
     }
 
     /**

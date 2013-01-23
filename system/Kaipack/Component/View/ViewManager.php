@@ -28,25 +28,23 @@ class ViewManager extends ComponentAbstract
      */
     public function boot()
     {
-        $cm = $this->getComponentManager();
+        $container = $this->getContainer();
 
-        // Установить полный путь к шаблонам проекта.
-        $templatesRealDir = $cm->getParam('base-dir') . $cm->getParam('view.template-dir');
-
-        if (!is_dir($templatesRealDir) && !is_readable($templatesRealDir)) {
+        // Устанавливаем путь к шаблону.
+        $templatesDir = $container->getParameter('base-dir') . $container->getParameter('view.template-dir');
+        if (!is_readable($templatesDir)) {
             throw new \Exception(sprintf(
                 'Каталог шаблонов "%s" не найден или он не доступен для чтения',
-                $templatesRealDir
+                $templatesDir
             ));
         }
 
-        // Переопределяем параметр директории шаблонов.
-        $cm->setParam('view.template-dir', $templatesRealDir);
+        $container->setParameter('view.template-dir', $templatesDir);
 
-        // Устанавливаем полный путь к кэшу шаблонов.
-        $templatesCacheDir = $cm->getParam('base-dir') . $cm->getParam('view.options.cache');
+        // Устанавливаем путь к кэшу шаблонов.
+        $templatesCacheDir = $container->getParameter('base-dir') . $container->getParameter('view.options.cache');
 
-        if (!is_dir($templatesCacheDir) && !is_readable($templatesCacheDir)) {
+        if (!is_readable($templatesCacheDir)) {
             throw new \Exception(sprintf(
                 'Каталог кэша шаблонов "%s" не найден или он не доступен для чтения',
                 $templatesCacheDir
@@ -54,13 +52,15 @@ class ViewManager extends ComponentAbstract
         }
 
         // Переопределяем параметр директорию кэша шаблонов.
-        $cm->setParam('view.options.cache', $templatesCacheDir);
+        $container->setParameter('view.options.cache', $templatesCacheDir);
 
-        $this->_twig = $cm->get('view.twig-environment');
+        $this->_twig = $container->get('view.twig-environment');
 
         // Регистрируем слушателей.
-        $em = $cm->get('event-manager');
-        $em->attach(new Listener\View());
+        $e  = $container->get('event-dispatcher');
+        $e->setView($this);
+        $em = $container->get('event-manager');
+        $em->attach(new Listener\ViewListener());
     }
 
 
@@ -105,7 +105,7 @@ class ViewManager extends ComponentAbstract
      * @param $value
      * @return ViewManager
      */
-    public function assign($key, $value)
+    public function setVariable($key, $value)
     {
         $this->_variables[$key] = $value;
         return $this;

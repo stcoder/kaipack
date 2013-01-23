@@ -1,11 +1,14 @@
 <?php
 
 namespace Module\Admin\Controller;
+use Kaipack\Component\Module\Controller\ControllerAbstract;
 
-class IndexController
+class IndexController extends ControllerAbstract
 {
     public function homeAction()
     {
-        return [];
+        return array(
+            'message' => 'hello wworld'
+        );
     }
 }

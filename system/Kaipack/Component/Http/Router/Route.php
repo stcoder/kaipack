@@ -12,11 +12,6 @@ class Route
     /**
      * @var string
      */
-    protected $_method = '';
-
-    /**
-     * @var string
-     */
     protected $_uri = '';
 
     /**
@@ -25,11 +20,6 @@ class Route
      * @var string
      */
     protected $_regex = '';
-
-    /**
-     * @var array
-     */
-    protected $_variables = [];
 
     /**
      * @var string
@@ -47,11 +37,9 @@ class Route
     protected $_action = '';
 
     /**
-     * Доступные методы.
-     *
      * @var array
      */
-    protected $_permitedMethods = ['get', 'post', 'head', 'put', 'delete'];
+    protected $_variables = [];
 
     /**
      * @param string $name
@@ -100,7 +88,7 @@ class Route
      * Парсит настройки маршрута.
      *
      * <code>
-     *     $r = new Route('home', 'get / module@controller:action');
+     *     $r = new Route('home', '/ module@controller:action');
      * </code>
      *
      * @param $stringOption
@@ -110,31 +98,27 @@ class Route
     {
         $options = explode(' ', $stringOption);
 
-        if (count($options) < 3) {
+        if (count($options) < 2) {
             throw new \DomainException('Не верно составлены параметры маршрута');
         }
 
-        // Определяем метод.
-        $method = $options[0];
-        $this->setMethod((isset($this->_permitedMethods[$method])) ? $method : 'get');
-
         // Определяем uri.
-        $this->setUri($options[1]);
+        $this->setUri($options[0]);
         $this->_setVariablesFoundUri($this->getUri());
 
         // Определяем модуль.
-        if (($modulePosition = strpos($options[2], '@'))) {
-            $this->setModule(substr($options[2], 0, $modulePosition));
-            $options[2] = substr($options[2], $modulePosition + 1);
+        if (($modulePosition = strpos($options[1], '@'))) {
+            $this->setModule(substr($options[1], 0, $modulePosition));
+            $options[1] = substr($options[1], $modulePosition + 1);
         }
 
         // Определяем контролллер и действие.
-        list($controller, $action) = explode(':', $options[2]);
+        list($controller, $action) = explode(':', $options[1]);
         $this->setController($controller);
         $this->setAction($action);
 
         // Если были указаны переменные.
-        $variables = array_slice($options, 3);
+        $variables = array_slice($options, 2);
         if (!empty($variables)) {
             foreach($variables as $variable) {
                 list($varName, $varValue) = explode('=', $variable);
@@ -281,24 +265,6 @@ class Route
     public function getUri()
     {
         return $this->_uri;
-    }
-
-    /**
-     * @param $method
-     * @return Route
-     */
-    public function setMethod($method)
-    {
-        $this->_method = $method;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMethod()
-    {
-        return $this->_method;
     }
 
     /**
